@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +55,7 @@ public class ClientService {
 			return new ClientDTO(entity);
 			
 		} catch (ResourceNotFoundException e) {
-			throw new ResourceNotFoundException("Id not found" + id);
+			throw new ResourceNotFoundException("Id not found " + id);
 		}
 	}
 	
@@ -64,6 +65,15 @@ public class ClientService {
 		entity.setIncome(dto.getIncome());
 		entity.setBirthDate(dto.getBirthDate());
 		entity.setChildren(dto.getChildren());
+	}
+
+	public void delete(Long id) {
+		try {
+			repository.deleteById(id);
+			
+		} catch(EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException("Id not found " + id);
+		}
 	}
 
 }
