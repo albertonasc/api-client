@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alberto.clientapi.dto.ClientDTO;
 import com.alberto.clientapi.entities.Client;
 import com.alberto.clientapi.repositories.ClientRepository;
+import com.alberto.clientapi.services.exceptions.DataBaseException;
 import com.alberto.clientapi.services.exceptions.ResourceNotFoundException;
 
 @Service
@@ -73,6 +75,8 @@ public class ClientService {
 			
 		} catch(EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException("Id not found " + id);
+		} catch(DataIntegrityViolationException e) {
+			throw new DataBaseException("Integrity violation");
 		}
 	}
 

@@ -27,15 +27,13 @@ public class ClientResource {
 	
 	@GetMapping
 	public ResponseEntity<List<ClientDTO>> findAll() {
-		List<ClientDTO> list = service.findAll();
-		
+		List<ClientDTO> list = service.findAll();		
 		return ResponseEntity.ok().body(list);
 	}
 	
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<ClientDTO> findById(@PathVariable Long id) {
-		ClientDTO dto =  service.findById(id);
-		
+		ClientDTO dto =  service.findById(id);		
 		return ResponseEntity.ok().body(dto);
 	}
 	
