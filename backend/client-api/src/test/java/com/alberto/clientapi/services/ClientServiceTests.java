@@ -22,7 +22,7 @@ import com.alberto.clientapi.entities.Client;
 import com.alberto.clientapi.repositories.ClientRepository;
 
 @ExtendWith(SpringExtension.class)
-public class ClienteServiceTests {
+public class ClientServiceTests {
 	
 	@InjectMocks
 	private ClientService service;
