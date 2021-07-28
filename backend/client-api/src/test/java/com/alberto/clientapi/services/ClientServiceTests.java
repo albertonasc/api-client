@@ -10,6 +10,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,7 @@ public class ClientServiceTests {
 	private long nonExistingId;
 	private long dependentId;
 	private Client client;
+	private ClientDTO clientDTO;
 	private PageImpl<Client> page;
 	
 	@BeforeEach
@@ -50,6 +53,7 @@ public class ClientServiceTests {
 		nonExistingId = 2L;
 		dependentId = 3L;
 		client = createClient();
+		clientDTO = createClientDTO();
 		page = new PageImpl<>(List.of(client));
 	}
 	
@@ -87,6 +91,26 @@ public class ClientServiceTests {
 		});
 		
 		verify(repository, times(1)).findById(nonExistingId);
+	}
+	
+	@Test
+	public void updateShouldReturnClientDTOWhenIdExist() {
+		
+		when(repository.getOne(existingId)).thenReturn(client);		
+		when(repository.save(ArgumentMatchers.any())).thenReturn(client);
+		
+		ClientDTO result = service.update(existingId, clientDTO);
+		Assertions.assertNotNull(result);
+	}
+	
+	@Test
+	public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesExist() {
+		
+		doThrow(EntityNotFoundException.class).when(repository).getOne(nonExistingId);
+		
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.update(nonExistingId, clientDTO);
+		});
 	}
 	
 	@Test
@@ -128,4 +152,10 @@ public class ClientServiceTests {
 	private Client createClient() {
 		return new Client(1L, "Maria", "12345678910", 5.000, Instant.parse("2018-07-05T03:00:00Z"), 2);
 	}
+	
+	private ClientDTO createClientDTO() {
+		Client client = createClient();
+		return new ClientDTO(client);
+	}
+	
 }
