@@ -1,6 +1,7 @@
 package com.alberto.clientapi.services;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.alberto.clientapi.dto.ClientDTO;
 import com.alberto.clientapi.entities.Client;
 import com.alberto.clientapi.repositories.ClientRepository;
+import com.alberto.clientapi.services.exceptions.DataBaseException;
 import com.alberto.clientapi.services.exceptions.ResourceNotFoundException;
 
 @ExtendWith(SpringExtension.class)
@@ -38,6 +40,7 @@ public class ClientServiceTests {
 	
 	private long existingId;
 	private long nonExistingId;
+	private long dependentId;
 	private Client client;
 	private PageImpl<Client> page;
 	
@@ -45,6 +48,7 @@ public class ClientServiceTests {
 	void setUp() {
 		existingId = 1L;
 		nonExistingId = 2L;
+		dependentId = 3L;
 		client = createClient();
 		page = new PageImpl<>(List.of(client));
 	}
@@ -95,6 +99,30 @@ public class ClientServiceTests {
 		});
 		
 		verify(repository, times(1)).deleteById(existingId);
+	}
+	
+	@Test
+	public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+		
+		doThrow(ResourceNotFoundException.class).when(repository).deleteById(nonExistingId);
+		
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.delete(nonExistingId);
+		});
+		
+		verify(repository, times(1)).deleteById(nonExistingId);
+	}
+	
+	@Test
+	public void deleteShouldThrowDataBaseExceptionWhenIdDoesNotExist() {
+		
+		doThrow(DataBaseException.class).when(repository).deleteById(dependentId);
+		
+		Assertions.assertThrows(DataBaseException.class, () -> {
+			service.delete(dependentId);
+		});
+		
+		verify(repository, times(1)).deleteById(dependentId);
 	}
 	
 	private Client createClient() {
